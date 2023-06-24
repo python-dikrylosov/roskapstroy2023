@@ -14,20 +14,27 @@ for i in range(data.shape[0]):
         print("\n\n",i,data["id"][i],"\n",          data["name(название)"][i],"\n",data["responsibilities(Должностные обязанности)"][i],"\n",)
 
         ru_text = str(data["responsibilities(Должностные обязанности)"][i])
-
+        data_text = ru_text.lower()
+        print()
+        print("Получаем текст из строки Должностные Обязанности ")
         #Мешок слов
         # для мешка слов и TF-IDF импортируем:
         from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
         import nltk
-        nltk.download('punkt')  # для токенизации необходимо скачать модуль
-        import pymorphy2  # библиотека для лемматизации
-        nltk.download('punkt')
-        sen = nltk.sent_tokenize(ru_text)
-        print(sen)
-        nltk.download('stopwords')
         import pymorphy2
         import re
+        import re
         from nltk.corpus import stopwords
+        nltk.download('punkt')  # для токенизации необходимо скачать модуль
+        nltk.download('stopwords')
+        import pymorphy2  # библиотека для лемматизации
+        from sklearn.feature_extraction.text import CountVectorizer
+        import textdistance
+        import nltk
+        import pymorphy2
+        sen = nltk.sent_tokenize(ru_text)
+        print("Токенизируем")
+        print(sen)
 
         morph = pymorphy2.MorphAnalyzer()
         tokenized = []
@@ -42,34 +49,32 @@ for i in range(data.shape[0]):
                                 else:
                                         tok_sen += (' ' + w)
                 tokenized.append(tok_sen)
-
+        print("Токенизируем")
         print(tokenized)
-        print(sen)
-        print(sen[0].lower)
-        import re
+
+        print("Приводим весь текст в нижний регистр")
         txt = re.findall(r'[а-я]+', sen[0].lower())
         print(txt)
 
-        from sklearn.feature_extraction.text import CountVectorizer
+
         vectorizer = CountVectorizer()
         bag = vectorizer.fit_transform(tokenized)
+        print("сконвертировать набор текстов в матрицу токенов")
         print(vectorizer.vocabulary_)
+        print("подсчитываем")
         print(bag.toarray())
+        print(" \n")
         print(bag)
-        import textdistance
-        import nltk
-
-        nltk.download('stopwords')
-        import pymorphy2
 
         morph = pymorphy2.MorphAnalyzer()
+
         from string import punctuation
         import gensim.downloader as api
         model = api.load("word2vec-ruscorpora-300")
 
-        print('''Проверим косинусное сходство двух рускоязычных текстов.''')
+        print('Проверим косинусное сходство на наличие условия в тексте')
         text1 = ru_text
-        ru_text2 = str(data["responsibilities(Должностные обязанности)"][0])
+        ru_text2 = str("условия")
         text2 = str(ru_text2)
 
         def lemitiz(text: str):
@@ -90,7 +95,12 @@ for i in range(data.shape[0]):
 
         cos = textdistance.cosine(T1, T2)
         print(f'Тексты схожи на {100 * cos}%.')
-        time.sleep(10)
+        if (100 * cos) > 0:
+                print("Условия есть")
+                time.sleep(10)
+        elif (100 * cos) == 0:
+                print("Условий не обнаружено")
+        time.sleep(2)
 
 
 
